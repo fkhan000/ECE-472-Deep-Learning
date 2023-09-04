@@ -220,3 +220,58 @@ def test_all_trainable():
 
     #Finally, we check to make sure that the number of gradients computed is 4
     assert len(grads) == len(linear.trainable_variables + basis.trainable_variables) == 4
+
+
+
+#The last property I wanted to test was whether or not the gradient was being calculated properly
+#I got the idea for this test from the paper that we were assigned to read for the week: "Stochastic
+#Gradient Descent Tricks". To test if the gradient is correct, you can check if it can be used to approximate
+#the loss function if all of the variables are shifted by some value epsilon.
+    
+@pytest.mark.parametrize(
+    "num_inputs",
+    [(100), (50), (10), (20), (1000), (5000), (10000)]
+    )
+
+def test_correct_gradient(num_inputs):
+    rng = tf.random.get_global_generator()
+    rng.reset_from_seed(2384230948)
+
+
+    #We create a vector that we will use to make a very small shift to the variables
+    #The components are drawn from a uniform distribution from 0 to 1e-5
+    epsilon = rng.uniform(shape =  [num_inputs*3 + 1, 1],
+                          minval = 0,
+                          maxval = 1e-5)
+
+    #we instantiate our model and the basis functions
+    basis = Basis(num_inputs)
+    linear = Linear(num_inputs)
+
+    #randomly choose our initial point
+    a = rng.normal(shape=[num_inputs, 1])
+
+    #Next we compute the gradient of our loss function at point a
+    with tf.GradientTape() as tape:
+        z = linear(basis.evaluate(a))
+        loss1 = tf.math.reduce_mean(z**2)
+
+    grads = tape.gradient(loss1, linear.trainable_variables + basis.trainable_variables)
+
+    #we then shift our variables by the epsilon vector
+    linear.weights.assign_add(tf.transpose(epsilon[0:num_inputs]))
+    linear.bias.assign_add(epsilon[num_inputs:num_inputs + 1])
+    basis.means.assign_add(epsilon[num_inputs + 1:num_inputs*2 + 1])
+    basis.sdevs.assign_add(epsilon[num_inputs*2 + 1:])
+
+    #we calculate the new loss at this point (a stays fixed)
+    z = linear(basis.evaluate(a))
+    loss2 = tf.math.reduce_mean(z**2)
+
+
+    #and now we use the gradient to make a linear approximation for loss2
+    #we take the dot product between the gradient and the epsilon vector
+    delta_y = tf.matmul(grads[1], epsilon[0:num_inputs]) + tf.matmul(grads[0], epsilon[num_inputs:num_inputs + 1]) + tf.matmul(tf.transpose(grads[2]), epsilon[num_inputs + 1:num_inputs*2 + 1]) + tf.matmul(tf.transpose(grads[3]), epsilon[num_inputs*2 + 1:])
+
+    #and then we check to see if our approximation and the actual loss at this new point are close to one another. 
+    tf.debugging.assert_less(abs(loss2-  (loss1 + delta_y)), 0.01)
