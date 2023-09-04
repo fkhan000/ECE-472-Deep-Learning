@@ -2,6 +2,7 @@ import BasisExpansion as BE
 import math
 import tensorflow as tf
 import matplotlib.pyplot as plt
+import random
 
 #LINEAR CLASS: This class holds the weights and bias terms for the
 #linear regression model.
@@ -59,10 +60,10 @@ def step(alpha, variables, gradients):
 if __name__ == "__main__":
 
     #Here we set some initial parameters for our experiment.
-    num_func = 5
+    num_func = 3
     num_samples = 50
     step_size = 0.01
-    num_iters = 250
+    num_iters = 100
 
     #We fix the seed for our global generator so that we always
     #get the same initial values for our variables as well as the same
@@ -84,13 +85,15 @@ if __name__ == "__main__":
     linear = Linear(num_func)
 
     basis = BE.Basis(num_func)
-
+    indices = tf.constant(list(range(len(x))))
+    
     #Since we're performing SGD, for each iteration of gradient descent
     for itr in range(num_iters):
 
         #we go through each point in our training set
-        for idx in range(len(x)):
-
+        tf.random.shuffle(indices, seed = 0x439666E87BD123459BBB)
+        for idx in indices:
+            
             #and compute the gradient of the squared error of our model
             with tf.GradientTape() as tape:
 
@@ -111,6 +114,7 @@ if __name__ == "__main__":
             grads = tape.gradient(loss, parameters)
 
             step(step_size, parameters, grads)
+        #step_size = .05*(itr+1)**-1
 
     #Since the input values were taken by sampling from a uniform distribution, they aren't sorted
     #which means that if we wanted to plot the fitted curve we made as it is right now,
