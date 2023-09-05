@@ -165,6 +165,35 @@ def test_basis_dimen():
     tf.assert_equal(tf.shape(output)[0], numFunc)
 
 
+#This function tests to see if when we make a few adjustments to one of the basis functions
+#that we can get the normal pdf and get it to integrate to 1.
+def test_prob_dist():
+    rng = tf.random.get_global_generator()
+    rng.reset_from_seed(2384230948)
+
+    #we make only one gaussian in our basis
+    numFunc = 1
+
+    basis = Basis(numFunc)
+    
+    
+    #we're gonna integrate over a range that's 60 standard deviations across centered at the mean
+    #In the normal pdf, there's a factor of 1/2 in the exponent so we need to scale down the inputs to the gaussian
+    #by a factor of sqrt(0.5) so that we effectively get that 0.5 coefficient in the exponent
+    xdat = [basis.means[0].numpy() - (30 - 0.001*index)*(basis.sdevs[0].numpy()/(2**0.5)) for index in range(60000)]
+
+    #evaluate the basis function at these points
+    ydat = basis.evaluate(xdat)
+
+    
+    dx = 0.001*basis.sdevs[0].numpy()
+
+    #then we can just do a left hand Riemann sum by multiplying our evaluations by dx and adding them up
+    #After that, we have to scale what we have by the coefficient that's in the normal pdf
+    integ = tf.math.reduce_sum(ydat*dx)/(basis.sdevs[0].numpy()*(2*math.pi)**0.5)
+
+    #If the basis function is actually a guassian then our integral should be very close to 1
+    tf.assert_less(1 - integ, 0.01)
 
 ##INTEGRATION TESTING
 
