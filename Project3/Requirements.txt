@@ -1,0 +1,16 @@
+To run this program you need to have Python 3.11 or a later version installed. Addtionally
+you will need to have the following python libraries installed:
+
+	- Tensorflow
+	- numpy
+	- scikit-learn
+	- matplotlib
+
+
+Once installed, you can run the program by going to your terminal and going into the directory
+that this file is in. Then you can enter into the terminal, python3 Digit_Recognition.py.
+The program will take roughly 2 hours to complete training. After which you will see two 
+pdf files in the folder that the script is in. The file called Training_Validation_Error_Over_Time.pdf
+is a plot of the training and validation cross entropy error of the model as a function of the number
+of training steps. The second file, the one called Test_Accuracy_Over_Time is a plot of the accuracy
+of the model on the test set as a function of the number of training steps.
