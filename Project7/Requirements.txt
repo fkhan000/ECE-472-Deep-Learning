@@ -1,0 +1,14 @@
+To run this program you need to have the following libraries installed:
+
+tensorflow
+pillow
+numpy
+matplotlib
+tqdm
+
+
+Once installed, you can simply run the main.py on a terminal. The model will train on a masked version of the image that will be exported as masked_img.png
+in the same directory as the file for 5000 epochs. After that, it will attempt to recover the original image (Test_Card_F.png) by evaluating on the "test set"
+which contains all of the coordinates of the original image. The recovered image will be exported to the same directory as this text file and
+will be called extrap_img.png. Once it does that, the program will evaluate the trained model on a denser grid of points so that it can 
+create an upscaled version of the input image and this will be exported in the same directory as upsampled_img.png.
