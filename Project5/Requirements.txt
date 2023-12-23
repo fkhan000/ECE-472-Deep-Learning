@@ -1,0 +1,15 @@
+To run this program, you need to have Python 3.11.2 or a later version installed. Additionally, you will need 
+to install the following python librarires:
+
+- tensorflow
+- tensorflow_datasets
+- tensorflow_hub
+- tensorflow_text
+- matplotlib
+
+To run the program you can either run the python file from the terminal
+by using the command python3 AG_News_Classifier.py or you can run it through IDLE.
+For this project, IDLE ended up being much faster and I'm not entirely sure why.
+Once the program finishes executing, it will display a plot showing the accuracy
+of the trained model on both the test and training set as a function of the 
+number of epochs.
