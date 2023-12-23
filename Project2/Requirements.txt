@@ -1,0 +1,14 @@
+To run this program, you need to have Python 3.11 or a later version installed on your computer.
+Additonally, you need to have the following packages installed: 
+
+
+-	tensorflow
+-	matplotlib
+-	pytest
+-	numpy
+-	scikit-learn
+
+To run the program, you should open up your terminal and cd into the directory
+of this folder. Once there, you should enter in the following command:
+
+python classifier.py
